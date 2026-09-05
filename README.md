@@ -1,5 +1,6 @@
 # MealPrep
 
+![MealPrep](docs/assets/mealprep-banner.png)
 
 Take-home per la posizione di Mobile Software Engineer @ Blackboard Studio.
 
@@ -7,14 +8,14 @@ MealPrep è un'app React Native (bare CLI, TypeScript) che guida l'utente attrav
 
 ## Indice
 
-- [Cosa fa l'app](#cosa-fa-lapp)
-- [Come si avvia](#come-si-avvia)
-- [Dipendenze principali](#dipendenze-principali)
-- [Architettura](#architettura)
-- [Flusso e feature richieste dall'assegno](#flusso-e-feature-richieste-dallassegno)
-- [Feature extra (oltre l'assegno)](#feature-extra-oltre-lassegno)
-- [Struttura del progetto](#struttura-del-progetto)
-- [Documentazione aggiuntiva](#documentazione-aggiuntiva)
+1. [Cosa fa l'app](#cosa-fa-lapp)
+2. [Come si avvia](#come-si-avvia)
+3. [Dipendenze principali](#dipendenze-principali)
+4. [Architettura](#architettura)
+5. [Flusso e feature richieste dall'assegno](#flusso-e-feature-richieste-dallassegno)
+6. [Feature extra (oltre l'assegno)](#feature-extra-oltre-lassegno)
+7. [Struttura del progetto](#struttura-del-progetto)
+8. [Documentazione aggiuntiva](#documentazione-aggiuntiva)
 
 ## Cosa fa l'app
 
@@ -74,10 +75,7 @@ features/NomeFeature/
     └── Screens/     → schermata principale, riceve tutto via props (nessun atomo, nessun useEffect di fetch)
 ```
 
-Punti chiave:
-- **ViewModel puro**: non è un hook né un atomo, quindi è testabile in isolamento senza montare React.
-- **Query LLM come atomo**: la generazione del piano pasti è un `atomWithQuery` (`mealPlanQueryAtom`), quindi si attiva automaticamente alla sottoscrizione e viene cacheata; non serve nessun `useEffect` per lanciarla.
-- **Navigazione**: uno stack di `@react-navigation/native-stack` con header nascosto (`headerShown: false`, ogni schermata gestisce la propria UI), definito in `src/Core/Navigation/RootNavigator.tsx`.
+Un paio di punti chiave. Il ViewModel è puro: non è un hook né un atomo, quindi è testabile in isolamento senza dover montare React. La generazione del piano pasti è invece un `atomWithQuery` (`mealPlanQueryAtom`), quindi la query LLM si attiva automaticamente alla sottoscrizione e viene cacheata, senza bisogno di alcun `useEffect` per lanciarla. La navigazione tra le schermate è gestita da uno stack di `@react-navigation/native-stack` con header nascosto (`headerShown: false`, ogni schermata gestisce la propria UI), definito in `src/Core/Navigation/RootNavigator.tsx`.
 
 Documentazione di dettaglio in `docs/` (vedi sezione [Documentazione aggiuntiva](#documentazione-aggiuntiva)).
 
@@ -91,13 +89,17 @@ Le 5 schermate del flusso core, come da specifica:
 4. **Nutritional Goals** (`NutritionalGoals`) — obiettivi nutrizionali: Ricco di proteine, Povero di zuccheri/grassi/carboidrati/sale. Anche qui ogni opzione è una soglia reale sui valori nutrizionali per 100g del prodotto (`src/Core/Catalog/nutritionalGoals.ts`).
 5. **Weekly Meal Plan** (`MealPlan`) — piano di 7 giorni generato via LLM (OpenAI, workflow in `src/Core/Llm/mealPlanWorkflow.ts`). Il catalogo viene prima filtrato lato client secondo le esigenze/obiettivi selezionati, poi ridotto a un sottoinsieme rappresentativo (max 25 prodotti per reparto, 220 totali) per stare in un budget di token ragionevole; il prompt impone: piano interamente in italiano, uso esclusivo di `productId` reali dal sottoinsieme, `totalPrice` entro il budget scelto, e **3 pasti a giorno** (colazione/pranzo/cena, oltre il minimo di 1/giorno richiesto dal brief) con convenzioni italiane (niente pasta a colazione). Ogni pasto mostra nome, tipo pasto, tempo di preparazione, porzioni, prezzo, ingredienti e ricetta passo-passo. La navigazione tra i pasti dello stesso giorno avviene con swipe orizzontale sulla card; le linguette in alto cambiano giorno, con selezione automatica del giorno corrente all'apertura.
 
-## Feature extra (oltre l'assegno)
+## Feature e decisioni extra
 
-Non richieste dal brief, aggiunte come miglioramento del flusso:
+Non richieste dal brief, aggiunte come miglioramento del flusso.
 
-- **Lista della spesa aggregata** (`ShoppingList`, icona 🛒 in alto a destra su MealPlan): somma automaticamente le quantità dello stesso ingrediente usato in più ricette della settimana (es. salmone in 2 pasti → un'unica riga in grammi totali), raggruppata per reparto del supermercato nell'ordine tipico di percorrenza (frutta e verdura → panetteria → latticini → carne → ... → infanzia). Ogni riga è spuntabile, con testo barrato alla selezione.
-- **Esportazione PDF della lista della spesa** (pulsante "PDF" nella schermata Lista della spesa): genera un PDF via `react-native-html-to-pdf` e apre lo share sheet nativo (`react-native-share`) per salvarlo o inviarlo.
-- **Mi piace / Non mi piace su ogni pasto**: due pulsanti toggle sotto ogni ricetta. **Stato attuale: solo mock/UI** — il feedback è tenuto in un atomo locale (`mealFeedbackMapAtom`) e mostrato visivamente, ma non viene ancora usato per influenzare la generazione del piano. È pensato come base per una futura funzione di raccomandazione: l'idea è che una ricetta segnata "non mi piace" non venga più riproposta nelle generazioni successive del piano (passandola come vincolo di esclusione al prompt LLM), ma questa logica non è ancora implementata.
+La **lista della spesa aggregata** (`ShoppingList`, icona 🛒 in alto a destra su MealPlan) somma automaticamente le quantità dello stesso ingrediente usato in più ricette della settimana, ad esempio il salmone che compare in due pasti diversi finisce in un'unica riga con il totale in grammi. Le righe sono raggruppate per reparto del supermercato seguendo l'ordine tipico di percorrenza (frutta e verdura, panetteria, latticini, carne, e così via fino all'infanzia), e ognuna può essere spuntata, con il testo che viene barrato alla selezione.
+
+Dalla stessa schermata è possibile esportare la lista in **PDF** tramite `react-native-html-to-pdf`, che apre poi lo share sheet nativo (`react-native-share`) per salvarlo o inviarlo.
+
+Ogni pasto ha anche due pulsanti **mi piace / non mi piace** sotto la ricetta. Al momento è solo mock a livello di UI: il feedback viene tenuto in un atomo locale (`mealFeedbackMapAtom`) e mostrato visivamente, ma non influenza ancora la generazione del piano. L'idea è di usarlo in futuro come base per una funzione di raccomandazione, così che una ricetta segnata come "non mi piace" non venga più riproposta nelle generazioni successive (passandola come vincolo di esclusione al prompt LLM), ma questa parte non è ancora implementata.
+
+Un'altra scelta fatta rispetto al brief riguarda il modo in cui si scorrono i pasti della giornata: invece di far navigare l'utente da un giorno all'altro per vedere colazione, pranzo e cena, i tre pasti sono presentati come una card scorrevole orizzontalmente (swipe), mentre le linguette in alto restano dedicate al cambio giorno. All'apertura della schermata il piano si posiziona già sul giorno corrente, senza bisogno di cercarlo manualmente tra i sette.
 
 ## Struttura del progetto
 
@@ -118,7 +120,7 @@ src/Core/
 
 ## Documentazione aggiuntiva
 
-- `docs/02-mvvm-architecture.md` — dettaglio del pattern MVVM a 5 livelli e delle convenzioni sui form (linee guida architetturali generali del team, non tutte specifiche a questo progetto: es. gli esempi di validazione form non si applicano qui, non essendoci form con Zod in MealPrep).
-- `docs/04-tanstack-query-patterns.md`, `docs/05-loadable-state.md`, `docs/06-view-file-organization.md` — convenzioni correlate (query, stati di caricamento, organizzazione dei file di View).
-- `log/CONVERSATION_LOG.md` — log delle sessioni di sviluppo assistito da Claude Code su questo progetto.
-- `utilsDoc/README.pdf` — il brief originale dell'assegno.
+1. `docs/02-mvvm-architecture.md`, il dettaglio del pattern MVVM a 5 livelli e delle convenzioni sui form. Sono linee guida architetturali generali del team, non tutte specifiche a questo progetto: ad esempio gli esempi di validazione form non si applicano qui, non essendoci form con Zod in MealPrep.
+2. `docs/04-tanstack-query-patterns.md`, `docs/05-loadable-state.md` e `docs/06-view-file-organization.md`, che raccolgono le convenzioni correlate su query, stati di caricamento e organizzazione dei file di View.
+3. `log/CONVERSATION_LOG.md`, il log delle sessioni di sviluppo assistito da Claude Code su questo progetto.
+4. `utilsDoc/README.pdf`, il brief originale dell'assegno.
