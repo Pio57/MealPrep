@@ -67,3 +67,4 @@ yarn-error.log
 # Env / secrets (API keys)
 .env
 .env.local
+/src/types/env.d.ts

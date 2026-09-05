@@ -77,6 +77,14 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
+    // Use a newer CMake whose bundled ninja supports long paths on Windows
+    // (avoids "Filename longer than 260 characters" during native codegen builds)
+    externalNativeBuild {
+        cmake {
+            version "4.1.2"
+        }
+    }
+
     namespace "com.mealprepapp"
     defaultConfig {
         applicationId "com.mealprepapp"

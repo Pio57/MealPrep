@@ -1,0 +1,41 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/Assets/fonts/Promo-Bold.ttf",
+      "sha1": "3be21e8c689870f4cb255b90f3ea882ccae300c4"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-ExtraLight.ttf",
+      "sha1": "2cc2b1c713a03b1f1c3f68f307faeb0748cf3a13"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-Light.ttf",
+      "sha1": "65aae7792b97181803170e61643d8a8daeef67ab"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-Medium.ttf",
+      "sha1": "aaece27d1d98c0907830717f846cc6bec28e8df2"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-Normal.ttf",
+      "sha1": "ca92ba8c347f69a8d6a05e20e679fe3b3671678a"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-Regular.ttf",
+      "sha1": "7702705afc1ec07c8d07cb1953ed2a3c77a06cf5"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-SemiBold.ttf",
+      "sha1": "3cceab078532dc40bca1818dc608985fd9433204"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-Thin.ttf",
+      "sha1": "28fc6f81b05b0663075e98fbfdda7f197f8ef61e"
+    },
+    {
+      "path": "src/Assets/fonts/Promo-UltraLight.ttf",
+      "sha1": "94fd94a7ca9f43e3477dc6219d64e46cb8ce0037"
+    }
+  ]
+}
